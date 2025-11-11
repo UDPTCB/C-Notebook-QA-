@@ -1,74 +1,44 @@
 # C-Notebook-QA-
 
-# QA - Simple Notebook Application
+轻量的 C++20 项目模板与示例 — 本仓库包含用于学习与练习的 C++ 代码与 CMake 配置，便于在本地构建、测试与贡献。
 
-A lightweight and user-friendly notebook application built with C++ for Windows 11 x64 systems. This project demonstrates file handling operations with both plain text and binary encryption capabilities.
+[![CI](https://github.com/UDPTCB/C-Notebook-QA-/actions/workflows/ci.yml/badge.svg)](https://github.com/UDPTCB/C-Notebook-QA-/actions)
 
-## Features
+## 特性
+- 使用现代 C++20
+- 基于 CMake 的跨平台构建
+- GitHub Actions CI（构建 + 测试）
 
-- **Text File Operations**: Create, read, append, and delete notebook files
-- **Binary Encryption**: Secure your notes with simple XOR encryption
-- **Cross-Drive Support**: Automatically uses D:\database\ or falls back to C:\database\
-- **File Management**: List all existing notebooks in the database directory
-- **Interactive CLI**: Easy-to-use command-line interface
+## 先决条件
+- CMake >= 3.16
+- 支持 C++20 的编译器（g++ 10+/clang++ 10+/MSVC v19.28+）
+- build-essential（或等效的工具链）
 
-## Project Structure
-
-- **QA.cpp**: Main application source code
-- **QA.h**: Header file with dependencies
-- **CMakeLists.txt**: CMake configuration for building the project
-
-## Building the Project
-
-### Prerequisites
-- Windows 11 x64
-- Visual Studio 2022
-- CMake 3.8 or higher
-- C++20 or higher
-### Build Instructions
-1. Clone this repository
-2. Open the project in Visual Studio 2022
-3. Configure with CMake
-4. Build the solution
-
-### Important Note about MySQL Configuration
-⚠️ **The MySQL linking in CMakeLists.txt is redundant and can be safely removed.** The current codebase doesn't actually use MySQL functionality - the include directive and library linking were added but never implemented. You can delete these MySQL-related lines from both QA.h and CMakeLists.txt:
-
-**In QA.h:**
-```cpp
-// Remove this line:
-#pragma comment(lib, "D:\\Sever\\MySQL\\Server9.5\\lib\\libmysql.lib")
-// And this include:
-#include "D:\Sever\MySQL\Server9.5\include\mysql.h"
+## 本地构建（推荐）
+```bash
+# 在仓库根目录下
+mkdir -p build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . -- -j
+# 运行测试（如果有）
+ctest --output-on-failure
 ```
 
-**In CMakeLists.txt:**
-Remove the entire MySQL configuration section (lines 14-32) as the application only uses local file storage.
+在 Windows 上，可使用 "Visual Studio" 生成器或 Ninja：
+```powershell
+mkdir build; cd build
+cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release
+ctest --test-dir . --output-on-failure
+```
 
-## Usage
+## 代码风格 & 静态检查
+建议使用 clang-format（.clang-format 未包含时可自行添加）和 clang-tidy 进行格式化与静态检查。
 
-After launching the application, you can choose from the following operations:
+## 贡献
+非常欢迎贡献！
+- 提交 issue 以报告 bug 或建议新特性
+- Fork 仓库并创建 PR：请确保所有新增代码附有测试（如适用）并通过 CI
 
-- **0**: Write (overwrite) content to a notebook
-- **1**: Append content to an existing notebook
-- **2**: Read content from a notebook
-- **3**: Delete a notebook
-- **4**: List all notebooks
-- **5-8**: Binary encrypted operations (write, read, append, delete)
-- **help**: Display help message
-- **q**: Exit the application
-
-## Technical Details
-
-- Built with C++20 standard
-- Uses modern C++ features like `std::unique_ptr` and `std::filesystem`
-- Implements simple XOR encryption (0xAA key) for binary files
-- UTF-8 console support for international characters
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-*Note: This project was originally developed for learning purposes and demonstrates file I/O operations, memory management, and basic encryption techniques in C++.*
+## 许可证
+本项目采用 MIT 许可证（详见 LICENSE 文件）。
