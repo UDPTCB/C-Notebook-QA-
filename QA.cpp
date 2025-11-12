@@ -1,5 +1,5 @@
-// QA.cpp: Defines the entry point for the application.
-// Made by Doe in Sat, 8 11 2025 UTC+8
+﻿// QA.cpp: 定义应用程序的入口点。
+//Make from Doe in Sat, 8 11 2025 UTC+8
 
 #include "QA.h"
 namespace fs = std::filesystem;
@@ -22,6 +22,7 @@ private:
 	struct f1 {
 		string data;
 		string path;
+		string newpath;
 	};
 	std::unique_ptr<f1> ptr1;
 	
@@ -30,8 +31,40 @@ public:
 	void setdata(string d,string n){
 		ptr1 = std::make_unique<f1>(f1{ d, n });
 	}
-	
-	
+	void rename(string on, string nm) {
+		ptr1 = std::make_unique<f1>(f1{ "", on, nm });
+	}
+	bool rent() {
+		try {
+			fs::path q;
+			fs::path p;
+			if (!fs::exists(fs::path("D:\\database\\"))) {
+				q = fs::path("C:\\database\\" + ptr1->path + ".txt");
+			}
+			else {
+				q = fs::path("D:\\database\\" + ptr1->path + ".txt");
+			}
+			if (!fs::exists(fs::path("D:\\database\\"))) {
+				p = fs::path("C:\\database\\" + ptr1->newpath + ".txt");
+			}
+			else {
+				p = fs::path("D:\\database\\" + ptr1->newpath + ".txt");
+			}
+			if (fs::exists(q)) {
+				fs::rename(q,p);
+
+				return true;
+			}
+			else {
+				cout << "The file does not exist!" << endl;
+				return false;
+			}
+		}
+		catch (const std::exception& e) {
+			cout << "An error occurred: " << e.what() << endl;
+			return false;
+		}
+	}
 	bool save2() {
 		try {
 				fs::path q;
@@ -145,36 +178,68 @@ public:
 			return false;
 		}
 	}
-	bool sbin() {
+	bool renb() {
 		try {
 			fs::path q;
+			fs::path p;
 			if (!fs::exists(fs::path("D:\\database\\"))) {
-				q = fs::path("C:\\database\\" + ptr1->path + ".txt");
+				q = fs::path("C:\\database\\" + ptr1->path + ".bin");
 			}
 			else {
-				q = fs::path("D:\\database\\" + ptr1->path + ".txt");
+				q = fs::path("D:\\database\\" + ptr1->path + ".bin");
 			}
-			fstream file(q, ios::out | ios::binary);
-			if (!file) {
-				cout << "The file could not be opened!" << endl;
-				return false;
+			if (!fs::exists(fs::path("D:\\database\\"))) {
+				p = fs::path("C:\\database\\" + ptr1->newpath + ".bin");
 			}
 			else {
-				for (int i = 0; i < (ptr1->data).length(); i++) {
-					char secret_byte = (ptr1->data)[i] ^ 0xAA; // Using simple XOR encryption
-					file.write(&secret_byte, sizeof(secret_byte));
-					
-				}
-				file.close();
-				
+				p = fs::path("D:\\database\\" + ptr1->newpath + ".bin");
+			}
+			if (fs::exists(q)) {
+				fs::rename(q, p);
+
 				return true;
 			}
+			else {
+				cout << "The file does not exist!" << endl;
+				return false;
+			}
 		}
-
-
 		catch (const std::exception& e) {
 			cout << "An error occurred: " << e.what() << endl;
 			return false;
+		}
+	}
+	
+	bool sbin() {
+	try {
+		fs::path q;
+		if (!fs::exists(fs::path("D:\\database\\"))) {
+			q = fs::path("C:\\database\\" + ptr1->path + ".txt");
+		}
+		else {
+			q = fs::path("D:\\database\\" + ptr1->path + ".txt");
+		}
+		fstream file(q, ios::out | ios::binary);
+		if (!file) {
+			cout << "The file could not be opened!" << endl;
+			return false;
+		}
+		else {
+			for (int i = 0; i < (ptr1->data).length(); i++) {
+				char secret_byte = (ptr1->data)[i] ^ 0xAA; // 使用简单的异或加密
+				file.write(&secret_byte, sizeof(secret_byte));
+				file << endl;
+			}
+			file.close();
+				
+			return true;
+		}
+	}
+
+
+	catch (const std::exception& e) {
+		cout << "An error occurred: " << e.what() << endl;
+		return false;
 		}
 
 
@@ -199,7 +264,7 @@ public:
 			else {
 				char encrypted_byte;
 				while (infile.read(&encrypted_byte, sizeof(encrypted_byte))) {
-					char original_byte = encrypted_byte ^ 0xAA; // Decryption
+					char original_byte = encrypted_byte ^ 0xAA; // 解密
 					output += original_byte;
 				}
 				infile.close();
@@ -232,7 +297,7 @@ public:
 			}
 			else {
 				for (int i = 0; i < (ptr1->data).length(); i++) {
-					char secret_byte = (ptr1->data)[i] ^ 0xAA; // Using simple XOR encryption
+					char secret_byte = (ptr1->data)[i] ^ 0xAA; // 使用简单的异或加密
 					file.write(&secret_byte, sizeof(secret_byte));
 
 				}
@@ -277,7 +342,7 @@ public:
 	}
 	bool listAll() {
 	try {
-		// Iterate through all entries in the "D:\database" directory
+		// 遍历 "D:\database" 目录中的所有条目
 		fs::path q;
 		if (!fs::exists(fs::path("D:\\database\\"))) {
 			q = fs::path("C:\\database\\");
@@ -287,23 +352,23 @@ public:
 		}
 		for (const auto& entry : fs::directory_iterator(q)) {
 
-			// Check if the current entry is a regular file (not a folder)
+			// 检查当前条目是否是普通文件（不是文件夹）
 			if (entry.is_regular_file()) {
 
-				// Get the filename and output to console
-				// What entry.path().filename().string() does:
-				// - entry.path(): Gets the full path
-				// - .filename(): Extracts the filename part (removes path)
-				// - .string(): Converts to string format
+				// 获取文件名并输出到控制台
+				// entry.path().filename().string() 的作用：
+				// - entry.path(): 获取完整路径
+				// - .filename(): 提取文件名部分（去掉路径）
+				// - .string(): 转换为字符串格式
 				cout << entry.path().filename().string() << endl;
 			}
 		}
-		return true;  // Iteration successful
+		return true;  // 遍历成功
 	}
 	catch (const std::exception& e) {
-		// If an error occurs (e.g., directory doesn't exist), catch the exception and display error message
+		// 如果出现错误（比如目录不存在），捕获异常并显示错误信息
 		cout << "An error occurred: " << e.what() << endl;
-		return false;  // Iteration failed
+		return false;  // 遍历失败
 		}
 	}
 	void help() {
@@ -326,13 +391,13 @@ public:
 int main()
 {
 	try {
-		// Check and create database directory when program starts (executed only once)
+		// 程序启动时检查并创建数据库目录（只执行一次）
 		string basePath = "D:\\database";
 		if (!fs::exists("D:\\")) {
 			basePath = "C:\\database";
 		}
 		
-		// Check if directory exists, create if it doesn't
+		// 检查目录是否存在，不存在再创建
 		if (!fs::exists(basePath)) {
 			fs::create_directories(basePath);
 			cout << "Database directory created: " << basePath << endl;
@@ -350,7 +415,7 @@ int main()
 		
 		while (true) {
 			cout << "Notebook\n"
-						"0. write\n1. append\n2. read\n3. delete\n4. listAll\n5. Binary encrypted write\n6. Binary encrypted read\n7. Binary encrypted append\n8. Binary encrypted delete\nhelp. get help\nq. exit" << endl;
+						"0. write\n1. append\n2. read\n3. delete\n4. listAll\n5. Binary encrypted write\n6. Binary encrypted read\n7. Binary encrypted append\n8. Binary encrypted delete\n9. rename\n10. Binary encrypted rename\nhelp. get help\nq. exit" << endl;
 					string choice;
 		
 					cout << ">>> ";
@@ -538,6 +603,57 @@ int main()
 				else {
 					cout << "Failed to delete notebook." << endl;
 					continue;
+				}
+			}
+			else if (choice == "9") {
+				string oname, nname;
+				cout << "Enter the old name to rename(input exit to exit): " << endl;
+				getline(cin, oname);
+				if (oname == "exit") {
+					cout << "Operation cancelled." << endl;
+					continue;
+				}
+				cout << "Enter the new name(input exit to exit): " << endl;
+				getline(cin, nname);
+				if (nname == "exit") {
+					cout << "Operation cancelled." << endl;
+					continue;
+				}
+				else {
+
+					obj.rename(oname, nname);
+						
+					
+					if (!obj.rent()) {
+						cout << "Rename failed." << endl;
+					}
+					else {
+						cout << "Rename successful." << endl;
+					}
+				}
+			}
+			else if (choice == "10") {
+				string oname, nname;
+				cout << "Enter the old name to rename(input exit to exit): " << endl;
+				getline(cin, oname);
+				if (oname == "exit") {
+					cout << "Operation cancelled." << endl;
+					continue;
+				}
+				cout << "Enter the new name(input exit to exit): " << endl;
+				getline(cin, nname);
+				if (nname == "exit") {
+					cout << "Operation cancelled." << endl;
+					continue;
+				}
+				else {
+					obj.rename(oname, nname);
+					if (!obj.renb()) {
+						cout << "Rename failed." << endl;
+					}
+					else {
+						cout << "Rename successful." << endl;
+					}
 				}
 			}
 			else if (choice == "help") {
