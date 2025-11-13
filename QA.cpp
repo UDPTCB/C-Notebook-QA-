@@ -3,6 +3,7 @@
 
 #include "QA.h"
 namespace fs = std::filesystem;
+
 using namespace std;
 /*static void test() {
 	struct data1 {
@@ -15,6 +16,8 @@ using namespace std;
 	cout << ptrx->data << endl;
 }
 */
+
+
 class save{
 private:
 	//string data;
@@ -372,7 +375,7 @@ public:
 		}
 	}
 	void help() {
-		cout << "This is a simple notebook application.\n"
+		cout << "This is a simple Multi-purpose tool application.\n"
 			"0. write: Save content to a notebook file.(delete old)\n"
 			"1. append: Save content to a notebook file(app to end)\n"
 			"2. read: Read content from a notebook file.\n"
@@ -382,11 +385,334 @@ public:
 			"6. Binary encrypted read: Read content from a binary file with decryption.\n"
 			"7. Binary encrypted append: Append content to a binary file with encryption.\n"
 			"8. Binary encrypted delete: Delete a binary notebook file.\n"
+			
+			"9. rename: Rename a notebook file.\n"
+			"10. Binary encrypted rename: Rename a binary notebook file.\n"
 			"help: Display this help message.\n"
 			"q. exit: Exit the application." << endl;
 	
 	}
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class media {
+private:
+	struct f2 {
+		string name;
+		sf::RenderWindow window;
+		//sf::CircleShape circle;
+		//文本显示需要的成员
+		sf::Font font;
+		sf::Text text;
+		sf::Text itext;
+		
+		//按钮需要的成员
+		sf::RectangleShape button;
+		sf::Text buttonText;
+		//输入框需要的成员
+		sf::RectangleShape inputBox;
+		sf::Text inputText;
+		sf::String inputString;
+		string savestr;
+
+		bool isTyping;
+	};
+	std::unique_ptr<f2> ptr2;
+
+public:
+	save obj;
+	void setpath(string n) {
+		ptr2 = std::make_unique<f2>();
+		ptr2->name = n;
+	}
+	void win() {
+		try {
+
+			ptr2->window.create(sf::VideoMode(1600, 900), ptr2->name);
+			//初始化圆
+			/*ptr2->circle.setRadius(50.f);//设置半径
+			ptr2->circle.setFillColor(sf::Color::Red);//设置颜色
+			ptr2->circle.setPosition(350, 250);//设置位置(居中)*/
+			//初始化字体
+			ptr2->window.setKeyRepeatEnabled(true);
+			ptr2->font.loadFromFile("C:\\Windows\\Fonts\\simsun.ttc");
+			if (ptr2->font.getInfo().family.empty()) {
+				cout << "Error" << endl;
+			}
+			else {
+				cout << "Home: " << ptr2->font.getInfo().family << endl;
+			}
+			//设置文本
+			ptr2->text.setFont(ptr2->font);//加载字体
+			ptr2->text.setString("Note\nFormat: Choice/filename|content.Example: mynote|Hello World");//文本内容
+
+			ptr2->text.setCharacterSize(24);//设置字体大小(磅)
+			ptr2->text.setFillColor(sf::Color::White);//设置字体颜色
+			ptr2->text.setPosition(50, 45);//设置文本位置
+			//功能介绍
+			ptr2->itext.setFont(ptr2->font);
+			ptr2->itext.setString("0. write: Save content to a notebook file.(delete old)\n"
+								  "1. append: Save content to a notebook file(app to end)\n"
+								  "2. delete: Delete a notebook file.\n"
+								  "3. Binary encrypted write: Save content to a binary file with simple encryption.\n"
+								  "4. Binary encrypted append: Append content to a binary file with encryption.\n"
+								  "5. Binary encrypted delete: Delete a binary notebook file.\n"
+
+
+			);
+
+			ptr2->itext.setCharacterSize(24);
+			ptr2->itext.setFillColor(sf::Color::White);
+			ptr2->itext.setPosition(50, 550);
+			//初始化按钮背景(矩形)
+			ptr2->button.setSize(sf::Vector2f(200, 60));//设置按钮大小
+			ptr2->button.setFillColor(sf::Color::Green);//设置按钮颜色
+			ptr2->button.setPosition(50, 100);//设置按钮位置
+			//初始化按钮文本
+			ptr2->buttonText.setFont(ptr2->font);//加载字体
+			ptr2->buttonText.setString("NO");//按钮文本内容
+
+			ptr2->buttonText.setCharacterSize(24);//设置字体大小
+			ptr2->buttonText.setFillColor(sf::Color::White);//设置字体颜色
+			ptr2->buttonText.setPosition(50, 100);//设置按钮文本位置
+
+			//输入框
+			ptr2->inputBox.setSize(sf::Vector2f(500, 400));//设置输入框大小
+			ptr2->inputBox.setFillColor(sf::Color::White);//设置输入框颜色
+			ptr2->inputBox.setPosition(50, 150);//设置输入框位置
+			ptr2->inputBox.setOutlineThickness(2);//设置边框厚度
+			ptr2->inputBox.setOutlineColor(sf::Color::Blue);//设置边框颜色
+
+			//输入框文本
+			ptr2->inputText.setFont(ptr2->font);
+			ptr2->inputText.setString("Enter...");
+
+			ptr2->inputText.setCharacterSize(20);
+			ptr2->inputText.setFillColor(sf::Color::Black);
+			ptr2->inputText.setPosition(55, 155);
+
+			ptr2->inputString = "";
+			ptr2->isTyping = false;
+
+
+
+		}
+		catch (const std::exception& e) {
+			cout << "An error occurred: " << e.what() << endl;
+		}
+	}
+	void run() {
+		try {
+			if (!ptr2) { return; }
+
+			while (ptr2->window.isOpen()) {
+				sf::Event event;
+				while (ptr2->window.pollEvent(event)) {
+					if (event.type == sf::Event::Closed) {
+						ptr2->window.close();
+
+					}
+					if (event.type == sf::Event::MouseButtonPressed
+						) {
+						int mouseX = event.mouseButton.x;
+						int mouseY = event.mouseButton.y;
+
+						// 检查鼠标点击是否在按钮范围内
+						if (mouseX >= 50 && mouseX <= 250 &&
+							mouseY >= 100 && mouseY <= 160) {
+							ptr2->button.setFillColor(sf::Color::Red); // 更改按钮颜色
+							cout << "Wow, F..." << endl;
+						}
+
+					}
+					if (event.type == sf::Event::MouseButtonReleased) {
+						ptr2->button.setFillColor(sf::Color::Green); // 恢复按钮颜色
+
+					}
+					//点击输入框
+					if (event.type == sf::Event::MouseButtonPressed) {
+						int MouseX = event.mouseButton.x;
+						int MouseY = event.mouseButton.y;
+						if (MouseX >= 50 && MouseX <= 550 &&
+							MouseY >= 150 && MouseY <= 550) {
+							ptr2->isTyping = true;
+							ptr2->inputBox.setOutlineColor(sf::Color::Blue);
+						}
+						else {
+							ptr2->isTyping = false;
+							ptr2->inputBox.setOutlineColor(sf::Color::Black);
+						}
+
+					}
+					//键盘输入
+					if (event.type == sf::Event::TextEntered && ptr2->isTyping) {
+						//回车键提交(ASCII 13)
+						if (event.text.unicode == 13) {
+							std::basic_string<sf::Uint8> utf8Data = ptr2->inputString.toUtf8();
+							std::string utf8Str;
+							utf8Str.reserve(utf8Data.size());
+
+							for (sf::Uint8 byte : utf8Data) {
+								utf8Str += static_cast<char>(byte);
+							}
+							cout << utf8Str << endl;
+							
+							// 调试输出，看看实际保存的内容
+							/*cout << "原始保存内容: ";
+							for (char c : ptr2->savestr) {
+								printf("%02x ", (unsigned char)c);
+							}
+							cout << endl;
+							cout << "文本内容: " << ptr2->savestr << endl;*/
+							size_t ppl = utf8Str.find('/');
+							string ch = "0";
+							if (ppl != string::npos) {
+								ch = utf8Str.substr(0, ppl);
+								utf8Str = utf8Str.substr(ppl + 1);
+							}
+
+							// 查找 | 分隔符
+							size_t pos = utf8Str.find('|');
+							string filename = "test";
+							string content = utf8Str;
+
+							if (pos != string::npos) {
+								filename = utf8Str.substr(0, pos);
+								content = utf8Str.substr(pos + 1);
+							}
+
+							
+							if (!content.empty()) {
+								if (ch == "0") {
+									obj.setdata(content, filename);
+									obj.save2();
+								}
+								else if (ch == "1") {
+									obj.setdata(content, filename);
+									obj.save1();
+									
+								}
+								
+								else if (ch == "2") {
+									obj.setdata("", filename);
+									obj.delete1();
+									
+								}
+								
+								else if (ch == "3") {
+									obj.setdata(content, filename);
+									obj.sbin();
+									
+								}
+								
+								else if (ch == "4") {
+									obj.setdata(content, filename);
+									obj.abin();
+									
+								}
+								else if (ch == "5") {
+									obj.setdata("", filename);
+									obj.dbin();
+									
+								}
+								
+								else {
+									cout << "Invalid operation code. Use 0-7." << endl;
+								}
+								
+								
+								ptr2->savestr = "";
+
+							}
+							//cout << "Input submitted: " << ptr2->inputString.toAnsiString() << endl;
+							ptr2->inputString = "";
+							ptr2->inputText.setString("");//清空显示
+						}
+						else if (event.text.unicode == 8) {
+							if (!ptr2->inputString.isEmpty()) {
+								ptr2->inputString = ptr2->inputString.substring(0, ptr2->inputString.getSize() - 1);
+							}
+						}
+						else {
+
+							ptr2->inputString += event.text.unicode;
+
+
+						}
+
+						ptr2->inputText.setString(ptr2->inputString);
+					}
+
+				}
+				ptr2->window.clear(sf::Color::Black);
+				ptr2->window.draw(ptr2->text);
+				ptr2->window.draw(ptr2->itext);
+				ptr2->window.draw(ptr2->button);//绘制按钮背景
+				ptr2->window.draw(ptr2->buttonText);//绘制按钮文本
+				ptr2->window.draw(ptr2->inputBox);//绘制输入框
+				ptr2->window.draw(ptr2->inputText);//绘制输入文本
+				ptr2->window.display();
+
+			}
+		}
+
+		catch (const std::exception& e) {
+			cout << "An error occurred: " << e.what() << endl;
+		}
+	}
+	
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 int main()
 {
@@ -406,15 +732,17 @@ int main()
 			
 			cout << "Database directory: " << basePath << endl;
 		}
-
-		SetConsoleOutputCP(CP_UTF8);
-		SetConsoleCP(CP_UTF8);
+		
+		
+		SetConsoleOutputCP(65001);
+		SetConsoleCP(65001);
+		
 		save obj;
-
+		media sf;
 		
 		
 		while (true) {
-			cout << "Notebook\n"
+			cout << "Multi-purpose tool\n"
 						"0. write\n1. append\n2. read\n3. delete\n4. listAll\n5. Binary encrypted write\n6. Binary encrypted read\n7. Binary encrypted append\n8. Binary encrypted delete\n9. rename\n10. Binary encrypted rename\nhelp. get help\nq. exit" << endl;
 					string choice;
 		
@@ -655,6 +983,15 @@ int main()
 						cout << "Rename successful." << endl;
 					}
 				}
+			}
+			else if (choice == "test") {
+				sf.setpath("QA");
+				sf.win();
+				
+				sf.run();
+					
+				
+				
 			}
 			else if (choice == "help") {
 				obj.help();
