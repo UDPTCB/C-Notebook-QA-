@@ -1,103 +1,86 @@
-QA - Multi-purpose Tool Application
+# QA - Multi-purpose Tool Application
+
 A versatile C++ application that provides both graphical and command-line interfaces for file management operations with basic encryption capabilities.
 
-Features
-Graphical Interface (Default)
-Complete GUI: Full-featured SFML-based graphical interface
+## Features
 
-File Operations: Create, read, append, delete, and rename files
+### Graphical Interface (Default)
+- **Complete GUI**: Full-featured SFML-based graphical interface
+- **File Operations**: Create, read, append, delete, and rename files
+- **Encryption Support**: XOR-encrypted binary file operations
+- **Visual Feedback**: Real-time output display and interactive controls
+- **Background Support**: Custom background image support
 
-Encryption Support: XOR-encrypted binary file operations
+### Command Line Interface
+- **Full Functionality**: Complete command-line interface with all features
+- **Text File Operations**: Create, read, append, delete, and rename text files
+- **Binary File Operations**: Encrypted read/write/append/delete with XOR encryption
+- **File Management**: List all files, batch operations
+- **Interactive Shell**: User-friendly menu system
 
-Visual Feedback: Real-time output display and interactive controls
+## Quick Start
 
-Background Support: Custom background image support
+### Method 1: Graphical Interface (Recommended)
+1. Download the latest pre-compiled binary from the Releases page
+2. Extract the ZIP file
+3. Run `QA.exe` - it will automatically start with the full graphical interface
+4. All required DLLs are included
 
-Command Line Interface
-Full Functionality: Complete command-line interface with all features
+### Method 2: Command Line Interface
+1. Open terminal/command prompt in the executable directory
+2. Run: `QA.exe shell`
+3. Use the interactive menu system
 
-Text File Operations: Create, read, append, delete, and rename text files
+## Installation & Building from Source
 
-Binary File Operations: Encrypted read/write/append/delete with XOR encryption
+### Prerequisites
+- **SFML 2.6.1** - Multimedia library for graphics, windowing, and system operations
+- **CMake 3.8+** - Build system
+- **C++23 Compatible Compiler** - Visual Studio 2019+ recommended
 
-File Management: List all files, batch operations
+### Optional Dependencies
+- **MySQL** - Database support (currently redundant in this version)
 
-Interactive Shell: User-friendly menu system
+### Build Instructions
 
-Quick Start
-Method 1: Graphical Interface (Recommended)
-Download the latest pre-compiled binary from the Releases page
+#### Step 1: Configure SFML
+- Download SFML 2.6.1 from [SFML Official Website](https://www.sfml-dev.org/)
+- Extract SFML to your preferred location
+- **Important**: Update the SFML path in `CMakeLists.txt`:
+  ```cmake
+  set(SFML_ROOT "YOUR_SFML_PATH_HERE")  # Change this to your actual SFML path
+  ```
 
-Extract the ZIP file
-
-Run QA.exe - it will automatically start with the full graphical interface
-
-All required DLLs are included
-
-Method 2: Command Line Interface
-Open terminal/command prompt in the executable directory
-
-Run: QA.exe shell
-
-Use the interactive menu system
-
-Installation & Building from Source
-Prerequisites
-SFML 2.6.1 - Multimedia library for graphics, windowing, and system operations
-
-CMake 3.8+ - Build system
-
-C++23 Compatible Compiler - Visual Studio 2019+ recommended
-
-Optional Dependencies
-MySQL - Database support (currently redundant in this version)
-
-Build Instructions
-Step 1: Configure SFML
-Download SFML 2.6.1 from SFML Official Website
-
-Extract SFML to your preferred location
-
-Important: Update the SFML path in CMakeLists.txt:
-
-cmake
-set(SFML_ROOT "YOUR_SFML_PATH_HERE")  # Change this to your actual SFML path
-Step 2: Build with CMake
-bash
+#### Step 2: Build with CMake
+```bash
 # Configure the project
 cmake -B build -S .
 
 # Build the executable
 cmake --build build --config Release
-The executable will be generated in the build/Release directory.
+```
 
-Usage
-Graphical Interface Operations
+The executable will be generated in the `build/Release` directory.
+
+## Usage
+
+### Graphical Interface Operations
 The GUI provides a comprehensive interface with:
+- **Input Box**: Enter commands in format: `choice/filename|content`
+- **Output Box**: Real-time operation results and file contents
+- **Clear Button**: Clear output display
+- **Background Support**: Custom background images (place `QA.png` in database directory)
 
-Input Box: Enter commands in format: choice/filename|content
+#### Command Format Examples:
+- **Write**: `0/mynote|Hello World`
+- **Read**: `8/mynote|`
+- **Rename**: `6/oldname|newname-`
+- **List All**: `10/|`
+- **Help**: `help/|`
 
-Output Box: Real-time operation results and file contents
-
-Clear Button: Clear output display
-
-Background Support: Custom background images (place QA.png in database directory)
-
-Command Format Examples:
-Write: 0/mynote|Hello World
-
-Read: 8/mynote|
-
-Rename: 6/oldname|newname-
-
-List All: 10/|
-
-Help: help/|
-
-Command Line Operations
-When running QA.exe shell, you get access to:
-
-text
+### Command Line Operations
+When running `QA.exe shell`, you get access to:
+```
 0. write: Save content to a notebook file (overwrites existing)
 1. append: Append content to a notebook file
 2. read: Read content from a notebook file
@@ -112,76 +95,61 @@ text
 test: Launch graphical interface
 help: Display help message
 q: Exit the application
-File Storage
+```
+
+## File Storage
+
 The application automatically creates and uses a database directory:
-
-Primary: D:\database\
-
-Fallback: C:\database\
+- Primary: `D:\database\`
+- Fallback: `C:\database\`
 
 All files are stored with appropriate extensions:
+- Text files: `.txt`
+- Encrypted binary files: `.txt` (with XOR encryption)
 
-Text files: .txt
+## Encryption
 
-Encrypted binary files: .txt (with XOR encryption)
-
-Encryption
 Binary files use simple XOR encryption (0xAA key) for basic data protection:
+- **Encryption**: Each byte is XORed with 0xAA
+- **Decryption**: Same operation restores original content
+- **Purpose**: Provides elementary security for casual use
 
-Encryption: Each byte is XORed with 0xAA
+## Troubleshooting
 
-Decryption: Same operation restores original content
+### Common Issues
 
-Purpose: Provides elementary security for casual use
+1. **SFML Path Error** (When building from source):
+   - Ensure the SFML path in `CMakeLists.txt` matches your installation directory
+   - Verify SFML 2.6.1 is properly installed
 
-Troubleshooting
-Common Issues
-SFML Path Error (When building from source):
+2. **Missing DLLs** (When building from source):
+   - Copy required SFML DLLs to the same directory as the executable
+   - Required DLLs: `sfml-graphics-2.dll`, `sfml-window-2.dll`, `sfml-system-2.dll`
 
-Ensure the SFML path in CMakeLists.txt matches your installation directory
+3. **Font Issues**:
+   - The application uses `simsun.ttc` from Windows fonts directory
+   - If unavailable, it will fall back to system default fonts
 
-Verify SFML 2.6.1 is properly installed
+4. **Background Image**:
+   - Place `QA.png` in your database directory for custom background
+   - Supported formats: PNG, JPG, BMP
 
-Missing DLLs (When building from source):
+### Launch Modes
+- **Default**: `QA.exe` - Starts graphical interface directly
+- **CLI Mode**: `QA.exe shell` - Starts command-line interface
+- **GUI from CLI**: Type `test` in CLI to launch graphical interface
 
-Copy required SFML DLLs to the same directory as the executable
+## Development Status
 
-Required DLLs: sfml-graphics-2.dll, sfml-window-2.dll, sfml-system-2.dll
+- ✅ **Graphical Interface**: Fully functional and feature-complete
+- ✅ **Command Line Interface**: Fully functional and stable
+- ✅ **File Operations**: Complete with text and binary support
+- ✅ **Encryption**: Basic XOR encryption implemented
+- ✅ **Background Support**: Custom background images
+- ❌ **MySQL Integration**: Currently redundant, planned for future versions
 
-Font Issues:
-
-The application uses simsun.ttc from Windows fonts directory
-
-If unavailable, it will fall back to system default fonts
-
-Background Image:
-
-Place QA.png in your database directory for custom background
-
-Supported formats: PNG, JPG, BMP
-
-Launch Modes
-Default: QA.exe - Starts graphical interface directly
-
-CLI Mode: QA.exe shell - Starts command-line interface
-
-GUI from CLI: Type test in CLI to launch graphical interface
-
-Development Status
-✅ Graphical Interface: Fully functional and feature-complete
-
-✅ Command Line Interface: Fully functional and stable
-
-✅ File Operations: Complete with text and binary support
-
-✅ Encryption: Basic XOR encryption implemented
-
-✅ Background Support: Custom background images
-
-❌ MySQL Integration: Currently redundant, planned for future versions
-
-File Structure
-text
+## File Structure
+```
 QA/
 ├── QA.exe                 # Main executable
 ├── sfml-graphics-2.dll    # SFML graphics module
@@ -191,19 +159,20 @@ QA/
 ├── QA.h                   # Main header file
 ├── QA.cpp                 # Main source file
 └── CMakePresets.json      # CMake presets
-Contributing
+```
+
+## Contributing
+
 This project is open for contributions! Areas of interest:
+- Enhancing the graphical interface
+- Improving encryption methods
+- Adding new file formats
+- Performance optimizations
 
-Enhancing the graphical interface
+## License
 
-Improving encryption methods
-
-Adding new file formats
-
-Performance optimizations
-
-License
 This project is provided as-is for educational and personal use.
 
-Note: The pre-compiled Windows binary includes all necessary DLLs and is ready to run without additional setup. Choose between the beautiful graphical interface or the powerful command-line interface based on your needs!
+---
 
+**Note**: The pre-compiled Windows binary includes all necessary DLLs and is ready to run without additional setup. Choose between the beautiful graphical interface or the powerful command-line interface based on your needs!
