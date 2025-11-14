@@ -50,7 +50,7 @@ else()
 endif()
 
 # 将源代码添加到此项目的可执行文件。
-add_executable (QA "QA.cpp" "QA.h")
+add_executable (QA "QA.cpp" "QA.h" "app.rc")
 
 # 添加 SFML 包含路径和链接
 target_include_directories(QA PRIVATE ${SFML_INCLUDE_DIR})
