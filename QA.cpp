@@ -581,12 +581,35 @@ public:
 			ptr2->circle.setFillColor(sf::Color::Red);//设置颜色
 			ptr2->circle.setPosition(350, 250);//设置位置(居中)*/
 			//初始化字体
-			string q;
+			sf::Image icon;
+			string b;
 			if (!fs::exists("D:\\database\\")) {
-				q ="C:\\database\\";
+				b = "C:\\database\\app.png";
 			}
 			else {
-				q = "D:\\database\\";
+				b = "D:\\database\\app.png";
+			}
+			// 1. 优先从 D:\database\ 寻找
+			if (fs::exists(b)) {
+				if (icon.loadFromFile(b)) {
+					ptr2->window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+				}
+			}
+			// 2. 否则使用相对路径
+			else if (icon.loadFromFile("app.png")) {
+				ptr2->window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+			}
+			// 3. 都不存在就保持默认
+			else {
+				// 静默失败，使用默认图标
+			}
+
+			string q;
+			if (!fs::exists("D:\\database\\")) {
+				q ="C:\\database\\QA.png";
+			}
+			else {
+				q = "D:\\database\\QA.png";
 			}
 			if (!ptr2->backgroundTexture.loadFromFile(q)) {
 				// 如果加载失败，使用备用路径或显示错误
