@@ -8,7 +8,7 @@
 #pragma comment(lib, "D:\\Sever\\MySQL\\Server9.5\\lib\\libmysql.lib")
 #include <windows.h>
 
-
+#include <shellapi.h>  // 添加这个头文件，包含 CommandLineToArgvW
 
 #include <iostream>
 #include <string>

@@ -1,6 +1,17 @@
 ﻿// QA.cpp: 定义应用程序的入口点。
 //Make from Doe in Sat, 8 11 2025 UTC+8
+#pragma once
 
+// 设置 Windows 应用程序，隐藏控制台
+/*
+
+*/
+#ifdef _WIN32
+#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+#endif
+
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 #include "QA.h"
 namespace fs = std::filesystem;
 
@@ -155,6 +166,41 @@ public:
 			return false;
 		}
 	}
+	string uread() {
+		try{
+			fs::path q;
+			if (!fs::exists(fs::path("D:\\database\\"))) {
+				q = fs::path("C:\\database\\" + ptr1->path + ".txt");
+			}
+			else {
+				q = fs::path("D:\\database\\" + ptr1->path + ".txt");
+			}
+			fstream in(q, ios::in);
+			if (!in) {
+				cout << "The file could not be opened!" << endl;
+				return "";
+				
+			}
+			else {
+				string line;
+				string a;
+				cout << "Content of " << ptr1->path << ":" << endl;
+				while (getline(in, line)) {
+					a += line;
+				}
+				in.close();
+				cout << a << endl;
+				return a;
+				
+			}
+		
+		}
+		catch (const std::exception& e) {
+			cout << "An error occurred: " << e.what() << endl;
+			return "";
+		}
+		
+	}
 	bool delete1() {
 		try {
 			fs::path q;
@@ -212,7 +258,39 @@ public:
 			return false;
 		}
 	}
+	string urbin() {
+		try {
+			string output = "";
+			fs::path q;
+			if (!fs::exists(fs::path("D:\\database\\"))) {
+				q = fs::path("C:\\database\\" + ptr1->path + ".txt");
+			}
+			else {
+				q = fs::path("D:\\database\\" + ptr1->path + ".txt");
+			}
+			fstream infile(q, ios::in | ios::binary);
+			if (!infile) {
+				cout << "The file could not be opened!" << endl;
+				return "";
+			}
+			else {
+				char encrypted_byte;
+				while (infile.read(&encrypted_byte, sizeof(encrypted_byte))) {
+					char original_byte = encrypted_byte ^ 0xAA; // 解密
+					output += original_byte;
+				}
+				infile.close();
+				return output;
+
+				
+			}
+		}
+		catch (const std::exception& e) {
+			cout << "An error occurred: " << e.what() << endl;
+			return "";
+		}
 	
+	}
 	bool sbin() {
 	try {
 		fs::path q;
@@ -302,7 +380,7 @@ public:
 				for (int i = 0; i < (ptr1->data).length(); i++) {
 					char secret_byte = (ptr1->data)[i] ^ 0xAA; // 使用简单的异或加密
 					file.write(&secret_byte, sizeof(secret_byte));
-
+					file << endl;
 				}
 				file.close();
 
@@ -368,10 +446,43 @@ public:
 		}
 		return true;  // 遍历成功
 	}
+	
 	catch (const std::exception& e) {
 		// 如果出现错误（比如目录不存在），捕获异常并显示错误信息
 		cout << "An error occurred: " << e.what() << endl;
 		return false;  // 遍历失败
+		}
+	}
+	string ulistall() {
+		try {string file;
+			// 遍历 "D:\database" 目录中的所有条目
+			fs::path q;
+			if (!fs::exists(fs::path("D:\\database\\"))) {
+				q = fs::path("C:\\database\\");
+			}
+			else {
+				q = fs::path("D:\\database\\");
+			}
+			for (const auto& entry : fs::directory_iterator(q)) {
+
+				// 检查当前条目是否是普通文件（不是文件夹）
+				if (entry.is_regular_file()) {
+					
+					// 获取文件名并输出到控制台
+					// entry.path().filename().string() 的作用：
+					// - entry.path(): 获取完整路径
+					// - .filename(): 提取文件名部分（去掉路径）
+					// - .string(): 转换为字符串格式
+					file = file+ entry.path().filename().string()+"\n";
+				}
+			}
+			return file;
+		}
+
+		catch (const std::exception& e) {
+			// 如果出现错误（比如目录不存在），捕获异常并显示错误信息
+			cout << "An error occurred: " << e.what() << endl;
+			return "";
 		}
 	}
 	void help() {
@@ -427,7 +538,7 @@ private:
 		//文本显示需要的成员
 		sf::Font font;
 		sf::Text text;
-		sf::Text itext;
+		//sf::Text itext;
 		
 		//按钮需要的成员
 		sf::RectangleShape button;
@@ -439,6 +550,16 @@ private:
 		string savestr;
 
 		bool isTyping;
+		//输出框需要的成员
+		sf::RectangleShape outputBox;
+		sf::Text outputText;
+		sf::Text out;
+		string outputString;
+		//功能介绍变量
+		string all;
+		//背景图片png
+		sf::Texture backgroundTexture;
+		sf::Sprite backgroundSprite;
 	};
 	std::unique_ptr<f2> ptr2;
 
@@ -448,15 +569,36 @@ public:
 		ptr2 = std::make_unique<f2>();
 		ptr2->name = n;
 	}
+	void reset() {
+		ptr2.reset(); // 释放旧的窗口对象
+	}
 	void win() {
 		try {
-
+			
 			ptr2->window.create(sf::VideoMode(1600, 900), ptr2->name);
 			//初始化圆
 			/*ptr2->circle.setRadius(50.f);//设置半径
 			ptr2->circle.setFillColor(sf::Color::Red);//设置颜色
 			ptr2->circle.setPosition(350, 250);//设置位置(居中)*/
 			//初始化字体
+			string q;
+			if (!fs::exists("D:\\database\\")) {
+				q ="C:\\database\\";
+			}
+			else {
+				q = "D:\\database\\";
+			}
+			if (!ptr2->backgroundTexture.loadFromFile(q)) {
+				// 如果加载失败，使用备用路径或显示错误
+				if (!ptr2->backgroundTexture.loadFromFile("QA.png")) {
+					std::cout << "Failed to load background image!" << std::endl;
+					// 可以在这里设置一个默认颜色作为后备
+				}
+			}
+
+			ptr2->backgroundSprite.setTexture(ptr2->backgroundTexture);
+
+
 			ptr2->window.setKeyRepeatEnabled(true);
 			ptr2->font.loadFromFile("C:\\Windows\\Fonts\\simsun.ttc");
 			if (ptr2->font.getInfo().family.empty()) {
@@ -467,12 +609,13 @@ public:
 			}
 			//设置文本
 			ptr2->text.setFont(ptr2->font);//加载字体
-			ptr2->text.setString("Note\nFormat: Choice/filename|content.Example: mynote|Hello World");//文本内容
+			ptr2->text.setString("QA Multi-purpose tool\nWrite Format: Choice/filename|content.Example: mynote|Hello World\nRename Format: Choice/filename|newfilename-\nRead Format: Choice/filename|\nOther Format: Choice/\nTip: Run 'help'to get help");//文本内容
 
-			ptr2->text.setCharacterSize(24);//设置字体大小(磅)
+			ptr2->text.setCharacterSize(20);//设置字体大小(磅)
 			ptr2->text.setFillColor(sf::Color::White);//设置字体颜色
-			ptr2->text.setPosition(50, 45);//设置文本位置
+			ptr2->text.setPosition(50, 10);//设置文本位置
 			//功能介绍
+			/*
 			ptr2->itext.setFont(ptr2->font);
 			ptr2->itext.setString("0. write: Save content to a notebook file.(delete old)\n"
 								  "1. append: Save content to a notebook file(app to end)\n"
@@ -480,31 +623,36 @@ public:
 								  "3. Binary encrypted write: Save content to a binary file with simple encryption.\n"
 								  "4. Binary encrypted append: Append content to a binary file with encryption.\n"
 								  "5. Binary encrypted delete: Delete a binary notebook file.\n"
-
-
+								  "6. rename: Rename a notebook file.\n"
+								  "7. Binary encrypted rename: Rename a binary notebook file.\n"
+								  "8. read: Read content from a notebook file.\n"
+								  "9. Binary encrypted read: Read content from a binary file with decryption.\n"
+								  "10. listAll: List all notebook files in the database directory.\n"
 			);
 
 			ptr2->itext.setCharacterSize(24);
-			ptr2->itext.setFillColor(sf::Color::White);
+			ptr2->itext.setFillColor(sf::Color::Blue);
 			ptr2->itext.setPosition(50, 550);
+			*/
+			
 			//初始化按钮背景(矩形)
 			ptr2->button.setSize(sf::Vector2f(200, 60));//设置按钮大小
-			ptr2->button.setFillColor(sf::Color::Green);//设置按钮颜色
-			ptr2->button.setPosition(50, 100);//设置按钮位置
+			ptr2->button.setFillColor(sf::Color(128, 128, 128));//设置按钮颜色
+			ptr2->button.setPosition(670, 100);//设置按钮位置
 			//初始化按钮文本
 			ptr2->buttonText.setFont(ptr2->font);//加载字体
-			ptr2->buttonText.setString("NO");//按钮文本内容
+			ptr2->buttonText.setString("Clear output.");//按钮文本内容
 
 			ptr2->buttonText.setCharacterSize(24);//设置字体大小
-			ptr2->buttonText.setFillColor(sf::Color::White);//设置字体颜色
-			ptr2->buttonText.setPosition(50, 100);//设置按钮文本位置
+			ptr2->buttonText.setFillColor(sf::Color::Black);//设置字体颜色
+			ptr2->buttonText.setPosition(675, 105);//设置按钮文本位置
 
 			//输入框
-			ptr2->inputBox.setSize(sf::Vector2f(500, 400));//设置输入框大小
+			ptr2->inputBox.setSize(sf::Vector2f(550, 400));//设置输入框大小
 			ptr2->inputBox.setFillColor(sf::Color::White);//设置输入框颜色
 			ptr2->inputBox.setPosition(50, 150);//设置输入框位置
 			ptr2->inputBox.setOutlineThickness(2);//设置边框厚度
-			ptr2->inputBox.setOutlineColor(sf::Color::Blue);//设置边框颜色
+			ptr2->inputBox.setOutlineColor(sf::Color::Black);//设置边框颜色
 
 			//输入框文本
 			ptr2->inputText.setFont(ptr2->font);
@@ -517,8 +665,29 @@ public:
 			ptr2->inputString = "";
 			ptr2->isTyping = false;
 
+			//输出框
+			ptr2->outputBox.setSize(sf::Vector2f(800, 600));
+			ptr2->outputBox.setFillColor(sf::Color::White);
+			ptr2->outputBox.setPosition(570, 150);
+			ptr2->outputBox.setOutlineThickness(2);
+			ptr2->outputBox.setOutlineColor(sf::Color::Black);
 
+			//输出框文本
+			ptr2->outputText.setFont(ptr2->font);
+			ptr2->outputText.setString("Output: ");
 
+			ptr2->outputText.setCharacterSize(20);
+			ptr2->outputText.setFillColor(sf::Color::White);
+			ptr2->outputText.setPosition(575, 125);
+
+			//实时变化的输出内容
+			ptr2->out.setFont(ptr2->font);
+			ptr2->outputString = "";
+			ptr2->out.setString(ptr2->outputString);
+
+			ptr2->out.setCharacterSize(16);
+			ptr2->out.setFillColor(sf::Color::Black);
+			ptr2->out.setPosition(575, 150);
 		}
 		catch (const std::exception& e) {
 			cout << "An error occurred: " << e.what() << endl;
@@ -541,22 +710,23 @@ public:
 						int mouseY = event.mouseButton.y;
 
 						// 检查鼠标点击是否在按钮范围内
-						if (mouseX >= 50 && mouseX <= 250 &&
+						if (mouseX >= 670 && mouseX <= 870 &&
 							mouseY >= 100 && mouseY <= 160) {
-							ptr2->button.setFillColor(sf::Color::Red); // 更改按钮颜色
-							cout << "Wow, F..." << endl;
+							ptr2->button.setFillColor(sf::Color(169, 169, 169)); // 更改按钮颜色
+							ptr2->outputString = "";
+							ptr2->out.setString(ptr2->outputString);
 						}
 
 					}
 					if (event.type == sf::Event::MouseButtonReleased) {
-						ptr2->button.setFillColor(sf::Color::Green); // 恢复按钮颜色
+						ptr2->button.setFillColor(sf::Color(128, 128, 128)); // 恢复按钮颜色
 
 					}
 					//点击输入框
 					if (event.type == sf::Event::MouseButtonPressed) {
 						int MouseX = event.mouseButton.x;
 						int MouseY = event.mouseButton.y;
-						if (MouseX >= 50 && MouseX <= 550 &&
+						if (MouseX >= 50 && MouseX <= 600 &&
 							MouseY >= 150 && MouseY <= 550) {
 							ptr2->isTyping = true;
 							ptr2->inputBox.setOutlineColor(sf::Color::Blue);
@@ -588,7 +758,7 @@ public:
 							cout << endl;
 							cout << "文本内容: " << ptr2->savestr << endl;*/
 							size_t ppl = utf8Str.find('/');
-							string ch = "0";
+							string ch = "";
 							if (ppl != string::npos) {
 								ch = utf8Str.substr(0, ppl);
 								utf8Str = utf8Str.substr(ppl + 1);
@@ -605,7 +775,7 @@ public:
 							}
 
 							
-							if (!content.empty()) {
+							if (!content.empty() || ch == "8" || ch == "9" || ch == "10" || ch == "help") {
 								if (ch == "0") {
 									obj.setdata(content, filename);
 									obj.save2();
@@ -638,9 +808,61 @@ public:
 									obj.dbin();
 									
 								}
-								
+								else if (ch == "6") {
+									size_t po = content.find('-');
+									string newname = "renamed";
+									if (po != string::npos) {
+										newname = content.substr(0,po);
+										content = content.substr(po + 1);
+									}
+									obj.rename(filename, newname);
+									obj.rent();
+								}
+								else if (ch == "7") {
+									size_t po = content.find('-');
+									string newname = "renamed";
+									if (po != string::npos) {
+										newname = content.substr(0, po);
+										content = content.substr(po + 1);
+									}
+									obj.rename(filename, newname);
+									obj.renb();
+								}
+								else if (ch == "8") {
+									obj.setdata("", filename);
+									ptr2->outputString = obj.uread();
+									
+									ptr2->out.setString(sf::String::fromUtf8(ptr2->outputString.begin(), ptr2->outputString.end()));
+
+								}
+								else if (ch == "9") {
+									obj.setdata("", filename);
+									ptr2->outputString = obj.urbin();
+
+									ptr2->out.setString(sf::String::fromUtf8(ptr2->outputString.begin(), ptr2->outputString.end()));
+								}
+								else if (ch == "10") {
+									obj.setdata("", "");
+									ptr2->outputString = obj.ulistall();
+									ptr2->out.setString(sf::String::fromUtf8(ptr2->outputString.begin(), ptr2->outputString.end()));
+								}
+								else if (ch == "help") {
+									ptr2->all = "0. write: Save content to a notebook file.(delete old)\n"
+											    "1. append: Save content to a notebook file(app to end)\n"
+												"2. delete: Delete a notebook file.\n"
+												"3. Binary encrypted write: Save content to a binary file with simple encryption.\n"
+												"4. Binary encrypted append: Append content to a binary file with encryption.\n"
+												"5. Binary encrypted delete: Delete a binary notebook file.\n"
+												"6. rename: Rename a notebook file.\n"
+												"7. Binary encrypted rename: Rename a binary notebook file.\n"
+												"8. read: Read content from a notebook file.\n"
+												"9. Binary encrypted read: Read content from a binary file with decryption.\n"
+												"10. listAll: List all notebook files in the database directory.\n";
+									ptr2->out.setString(sf::String::fromUtf8(ptr2->all.begin(), ptr2->all.end()));
+								}
 								else {
-									cout << "Invalid operation code. Use 0-7." << endl;
+									ptr2->outputString = "Invalid operation code. Use 0-10 or help.";
+									ptr2->out.setString(sf::String::fromUtf8(ptr2->outputString.begin(), ptr2->outputString.end()));
 								}
 								
 								
@@ -667,13 +889,17 @@ public:
 					}
 
 				}
-				ptr2->window.clear(sf::Color::Black);
+				ptr2->window.clear();
+				ptr2->window.draw(ptr2->backgroundSprite); // 先绘制背景
 				ptr2->window.draw(ptr2->text);
-				ptr2->window.draw(ptr2->itext);
+				//ptr2->window.draw(ptr2->itext);
 				ptr2->window.draw(ptr2->button);//绘制按钮背景
 				ptr2->window.draw(ptr2->buttonText);//绘制按钮文本
 				ptr2->window.draw(ptr2->inputBox);//绘制输入框
 				ptr2->window.draw(ptr2->inputText);//绘制输入文本
+				ptr2->window.draw(ptr2->outputBox);
+				ptr2->window.draw(ptr2->outputText);
+				ptr2->window.draw(ptr2->out);
 				ptr2->window.display();
 
 			}
@@ -733,12 +959,44 @@ int main()
 			cout << "Database directory: " << basePath << endl;
 		}
 		
+		// 检查命令行参数
+		/*
 		
-		SetConsoleOutputCP(65001);
-		SetConsoleCP(65001);
-		
+		*/
+		int argc;
+		LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+		bool showConsole = false;
+
+		// 如果有命令行参数且包含 "shell"，则显示控制台
+		if (argc > 1) {
+			std::wstring firstArg = argv[1];
+			if (firstArg == L"shell") {
+				showConsole = true;
+				// 分配控制台
+				AllocConsole();
+				freopen("CONOUT$", "w", stdout);
+				freopen("CONOUT$", "w", stderr);
+				freopen("CONIN$", "r", stdin);
+				SetConsoleOutputCP(65001);
+				SetConsoleCP(65001);
+			}
+		}
+
+		LocalFree(argv);
 		save obj;
 		media sf;
+		
+
+		// 如果没有要求显示控制台，直接启动图形界面
+		if (!showConsole) {
+			sf.setpath("QA");
+			sf.win();
+			sf.run();
+			return 0;
+		}
+		
+		
 		
 		
 		while (true) {
@@ -985,14 +1243,13 @@ int main()
 				}
 			}
 			else if (choice == "test") {
+				sf.reset();  // 先重置媒体对象
 				sf.setpath("QA");
 				sf.win();
-				
 				sf.run();
-					
-				
-				
-			}
+				// 图形界面关闭后，重新显示控制台菜单
+				cout << "Returned to shell mode." << endl;
+				}
 			else if (choice == "help") {
 				obj.help();
 			}
